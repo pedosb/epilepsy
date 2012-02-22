@@ -54,7 +54,7 @@ class Tdms():
 				break
 #			self.data.append([float(n) for n in line.split('\t')])
 			i, j = line.split('\t')
-			self.wav.append(float(i) - float(j))
+			self.wav.append(np.abs(float(i) - float(j)))
 
 		self.size = len(self.wav)
 #		if len(self.channels) == 2:
@@ -76,6 +76,14 @@ class Tdms():
 		plt.colorbar()
 		plt.show()
 
+	def fft(self):
+		plt.plot(np.fft.fftfreq(1024, 1/self.fs),
+				10 * np.log10(np.fft.fft(self.wav, 1024)))
+		plt.grid()
+		plt.xlabel(u'Frequência (Hz)')
+		plt.ylabel('Amplitude (dB)')
+		plt.show()
+
 if __name__=='__main__':
 	parser = argparse.ArgumentParser(description='Manipulate TDMS file')
 	parser.add_argument('-f', '--input-file', required=True,
@@ -84,9 +92,13 @@ if __name__=='__main__':
 		help='plot the wave form of a two channels TDMS file')
 	parser.add_argument('-s', '--plot-specgram', action='store_true',
 		help='plot the spetogram of a two channels TDMS file')
+	parser.add_argument('-r', '--plot-fft', action='store_true',
+		help='plot the fft of a two channels TDMS file')
 	args = parser.parse_args()
 	t = Tdms(args.input_file)
 	if args.plot_wav_form:
 		t.plot()
 	if args.plot_specgram:
 		t.specgram()
+	if args.plot_fft:
+		t.fft()
