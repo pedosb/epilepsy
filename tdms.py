@@ -54,7 +54,7 @@ class Tdms():
 				break
 #			self.data.append([float(n) for n in line.split('\t')])
 			i, j = line.split('\t')
-			self.wav.append(np.abs(float(i) - float(j)))
+			self.wav.append(float(i) - float(j))
 
 		self.size = len(self.wav)
 #		if len(self.channels) == 2:
