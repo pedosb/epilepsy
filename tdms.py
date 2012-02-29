@@ -23,12 +23,23 @@ import argparse
 import matplotlib.pyplot as plt
 import numpy as np
 
+def file_len(f):
+	"""
+	http://stackoverflow.com/questions/845058/how-to-get-line-count-cheaply-in-python
+	"""
+	pos = f.tell()
+	for i, l in enumerate(f):
+		pass
+	f.seek(pos)
+	return i + 1
+
 class TdmsSyntaxError(Exception):
 	pass
 
 class Tdms():
 	def __init__(self, fn=None, ti=None):
 		self.load(fn, ti)
+
 	def load(self, fn, ti=None):
 		if ti is None:
 			ti = [0, -1]
@@ -51,7 +62,7 @@ class Tdms():
 			raise TdmsSyntaxError("Can't find data flag")
 
 		self.data = []
-		self.wav = []
+		self.wav = np.zeros(file_len(f))
 		self.data_tell = f.tell()
 		c = -1
 		while True:
@@ -63,7 +74,7 @@ class Tdms():
 				break
 #			self.data.append([float(n) for n in line.split('\t')])
 			i, j = line.split('\t')
-			self.wav.append(float(i) - float(j))
+			self.wav[c] = float(i) - float(j)
 
 		self.size = len(self.wav)
 		if self.size < self.stop - self.start:
@@ -100,6 +111,19 @@ class Tdms():
 		plt.xlabel(u'Frequência (Hz)')
 		plt.ylabel('Amplitude (dB)')
 		plt.show()
+
+def plot(*tdms):
+	lines = len(tdms)
+	c = -1
+	for t in tdms:
+		c += 1
+		plt.subplot(lines, 1, c)
+		plt.plot(np.linspace(0, len(t.wav)/t.fs, len(t.wav)),
+				t.wav)
+		plt.grid()
+		plt.xlabel('Tempo (segundos)')
+		plt.ylabel('Amplitude')
+	plt.show()
 
 if __name__=='__main__':
 	parser = argparse.ArgumentParser(description='Manipulate TDMS file')
