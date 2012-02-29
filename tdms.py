@@ -22,6 +22,7 @@
 import argparse
 import matplotlib.pyplot as plt
 import numpy as np
+from os import path
 
 def file_len(f):
 	"""
@@ -38,12 +39,13 @@ class TdmsSyntaxError(Exception):
 
 class Tdms():
 	def __init__(self, fn=None, ti=None):
-		self.load(fn, ti)
+		self.fn = fn
+		self.load(ti)
 
-	def load(self, fn, ti=None):
+	def load(self, ti=None):
 		if ti is None:
 			ti = [0, -1]
-		f = open(fn)
+		f = open(self.fn)
 		if f.readline().strip() != 'channel names:':
 			raise TdmsSyntaxError("Can't find channels names")
 		self.channels = f.readline().split('\t')
@@ -85,45 +87,92 @@ class Tdms():
 					break
 				c += 1
 			raise TdmsSyntaxError("Can't select time interval, must be between [0, %.2f]" % (c / self.fs))
+		f.close()
 #		if len(self.channels) == 2:
 #			self.wav = [i - j for i, j in self.data]
 #			del self.data
 
 	def plot(self):
-		plt.plot(np.linspace(0, len(self.wav)/self.fs, len(self.wav)),
-				self.wav)
-		plt.grid()
-		plt.xlabel('Tempo (segundos)')
-		plt.ylabel('Amplitude')
-		plt.show()
+		plot(self)
 
 	def specgram(self):
-		plt.specgram(self.wav, Fs=self.fs)
-		plt.xlabel('Tempo (segundos)')
-		plt.ylabel(u'Frequência (Hz)')
-		plt.colorbar()
-		plt.show()
+		plot_specgram(self)
 
-	def fft(self):
-		plt.plot(np.fft.fftfreq(1024, 1/self.fs),
-				10 * np.log10(np.fft.fft(self.wav, 1024)))
-		plt.grid()
-		plt.xlabel(u'Frequência (Hz)')
-		plt.ylabel('Amplitude (dB)')
-		plt.show()
+	def plot_fft(self):
+		plot_fft(self)
+
+def _plot(tdms):
+	plt.plot(np.linspace(0, len(tdms.wav)/tdms.fs, len(tdms.wav)),
+			tdms.wav)
+	plt.grid()
+	plt.xlabel('Tempo (segundos)')
+	plt.ylabel('Amplitude')
 
 def plot(*tdms):
+	_plot_all(tdms, _plot)
+
+def _plot_fft(tdms):
+	fft = np.fft.fft(tdms.wav, 1024)[:512]
+	plt.plot(np.fft.fftfreq(1024, 1/tdms.fs)[:512],
+			10 * np.log10(np.abs(fft)))
+	plt.grid()
+	plt.xlabel(u'Frequência (Hz)')
+	plt.ylabel('Amplitude (dB)')
+
+def plot_fft(*tdms):
+	_plot_all(tdms, _plot_fft)
+
+def _plot_specgram(tdms):
+	plt.specgram(tdms.wav, Fs=tdms.fs)
+	plt.xlabel('Tempo (segundos)')
+	plt.ylabel(u'Frequência (Hz)')
+	plt.colorbar()
+
+def plot_specgram(*tdms):
+	_plot_all(tdms, _plot_specgram)
+
+def plot_amp_and_fft(*tdms):
+	_plot_all(tdms, _plot_amp_and_fft, 2)
+
+def _plot_amp_and_fft(tdms, col):
+	if col == 1:
+		_plot(tdms)
+	elif col == 2:
+		_plot_fft(tdms)
+
+def _plot_any(tdms, col, plot_list):
+	n_col = plot_list.count(True)
+	plot_func = [_plot, _plot_fft, _plot_specgram]
+	plt.title(path.basename(str(tdms.fn)))
+	if n_col == 1:
+		plot_func[plot_list.index(True)](tdms)
+	elif n_col == 2:
+		first_index = plot_list.index(True)
+		if col == 1:
+			plot_func[first_index](tdms)
+		else:
+			plot_func[plot_list.index(True, first_index+1)](tdms)
+	elif n_col == 3:
+		plot_func[col-1](tdms)
+
+def _plot_all(tdms, plot_func, cols=None, plot_list=None):
 	lines = len(tdms)
-	c = -1
+	c = 0
 	for t in tdms:
-		c += 1
-		plt.subplot(lines, 1, c)
-		plt.plot(np.linspace(0, len(t.wav)/t.fs, len(t.wav)),
-				t.wav)
-		plt.grid()
-		plt.xlabel('Tempo (segundos)')
-		plt.ylabel('Amplitude')
+		for col in xrange(1, (cols + 1) if cols is not None else 2):
+			c += 1
+			plt.subplot(lines, cols, c)
+			if cols is not None:
+				plot_func(t, col, plot_list)
+			else:
+				plot_func(t)
 	plt.show()
+
+def plot_all(amplitude=False, fft=False,
+		specgram=False, *tdms):
+	plot_list = [amplitude, fft, specgram]
+	cols = plot_list.count(True)
+	_plot_all(tdms, _plot_any, cols, plot_list)
 
 if __name__=='__main__':
 	parser = argparse.ArgumentParser(description='Manipulate TDMS file')
