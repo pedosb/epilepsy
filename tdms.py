@@ -169,11 +169,11 @@ def _plot_all(tdms, plot_func, cols=None, plot_list=None, **kargs):
 	ti_list = kargs['ti']
 	del kargs['ti']
 	for t, i in zip(tdms, ti_list):
+		i = (int(i[0] * t.fs), int(i[1] * t.fs))
 		for col in xrange(1, (cols + 1) if cols is not None else 2):
 			c += 1
 			plt.subplot(lines, cols, c)
 			if cols is not None:
-				i = (int(i[0] * t.fs), int(i[1] * t.fs))
 				plot_func(t, col, plot_list, ti=i, **kargs)
 			else:
 				plot_func(t)
