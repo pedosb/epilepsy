@@ -59,11 +59,20 @@ class EpilepsyGui(QtGui.QMainWindow):
 		self.fft_le = QtGui.QLineEdit()
 		self.fft_le.returnPressed.connect(self.plot)
 		self.fft_le.setText('1024')
-#		self.fft_le.setInputMask('0000')
+
+		self.fft_unit_amplitue = QtGui.QRadioButton('Amplitude')
+		self.fft_unit_amplitue.setChecked(True)
+		self.fft_unit_power = QtGui.QRadioButton('Power')
+		fft_unit_vbox = QtGui.QVBoxLayout()
+		fft_unit_vbox.addWidget(self.fft_unit_amplitue)
+		fft_unit_vbox.addWidget(self.fft_unit_power)
+		fft_group_box = QtGui.QGroupBox('Unit')
+		fft_group_box.setLayout(fft_unit_vbox)
 
 		fft_hbox = QtGui.QHBoxLayout()
 		fft_hbox.addWidget(fft_label)
 		fft_hbox.addWidget(self.fft_le)
+		fft_hbox.addWidget(fft_group_box)
 		fft_hbox.addStretch(1)
 		fft_group_box = QtGui.QGroupBox('FFT configuration')
 		fft_group_box.setLayout(fft_hbox)
@@ -153,6 +162,11 @@ class EpilepsyGui(QtGui.QMainWindow):
 		plot_fft = self.plot_fft_check_box.isChecked()
 		plot_spec = self.plot_specgram_check_box.isChecked()
 
+		if self.fft_unit_amplitue.isChecked():
+			fft_unit = 'amp'
+		elif self.fft_unit_power.isChecked():
+			fft_unit = 'pow'
+
 #		plot_list = [i for i in self.tdms_list if i is not None]
 		plot_list = list()
 		ti_list = list()
@@ -170,7 +184,7 @@ class EpilepsyGui(QtGui.QMainWindow):
 		#ti = (int(ti_ini_le.text()), int(ti_fi_le.text()))
 
 		tdms.plot_all(plot_amp, plot_fft, plot_spec, *plot_list,
-				fft_len=int(fft_len_le), ti=ti_list)
+				fft_len=int(fft_len_le), ti=ti_list, fft_unit=fft_unit)
 
 	def menuInit(self):
 		exitAction = QtGui.QAction(QtGui.QIcon('Close-2-icon.png'), '&Exit', self)

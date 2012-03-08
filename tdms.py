@@ -117,13 +117,20 @@ def plot(*tdms):
 
 def _plot_fft(tdms, **kargs):
 	ti = kargs['ti']
+	fft_unit = kargs['fft_unit']
 	fft_len = kargs['fft_len']
 	fft = np.fft.fft(tdms.wav.__getslice__(*ti), fft_len)[:fft_len/2]
-	plt.plot(np.fft.fftfreq(fft_len, 1/tdms.fs)[:fft_len/2],
-			10 * np.log10(np.abs(fft)))
-	plt.grid()
+
 	plt.xlabel(u'Frequência (Hz)')
-	plt.ylabel('Amplitude (dB)')
+	if fft_unit == 'pow':
+		fft = fft * fft.conjugate() / fft_len
+		plt.ylabel('Amplitude (mV)^2/Hz')
+	elif fft_unit == 'amp':
+		fft = np.abs(fft / fft_len)
+		plt.ylabel('Amplitude mV/Hz')
+
+	plt.plot(np.fft.fftfreq(fft_len, 1/tdms.fs)[:fft_len/2], fft)
+	plt.grid()
 
 def plot_fft(*tdms):
 	_plot_all(tdms, _plot_fft)
