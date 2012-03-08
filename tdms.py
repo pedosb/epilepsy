@@ -119,17 +119,22 @@ def _plot_freq_hist(tdms, **kargs):
 	ti = kargs['ti']
 	fft_len = kargs['fft_len']
 	fft_scale = kargs['fft_scale']
-	p, f = plt.psd(tdms.wav.__getslice__(*ti),
+	n_bins = kargs['n_bins']
+
+#	bins = list()
+	s, f = plt.psd(tdms.wav.__getslice__(*ti),
 			fft_len,
 			tdms.fs)
-	if fft_scale == 'db':
-		plt.ylabel('Amplitude (mV)^2/Hz (dB)')
-	elif fft_scale == 'linear':
-		plt.cla()
-		plt.plot(f, p)
-		plt.ylabel('Amplitude (mV)^2/Hz')
-	plt.xlabel(u'Frequência (Hz)')
-	return
+	plt.cla()
+#	s = tdms.wav.__getslice__(*ti)
+	t = sum(s)
+	m = len(s) / n_bins
+	r = len(s) - m * n_bins
+	for i in xrange(n_bins):
+		step = i * m + (i if i < r else r)
+		b = step, step + m + (1 if i < r else 0)
+#		bins.append(b, sum(s.__getslice__(*b)))
+		plt.bar(b[0], sum(s.__getslice__(*b))/t, b[1] - b[0])
 
 def _plot_fft(tdms, **kargs):
 	ti = kargs['ti']

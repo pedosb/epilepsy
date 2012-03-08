@@ -79,6 +79,19 @@ class EpilepsyGui(QtGui.QMainWindow):
 		fft_group_box = QtGui.QGroupBox('PSD Configuration')
 		fft_group_box.setLayout(fft_hbox)
 
+		#Histogram configuration group box
+		freq_hist_label = QtGui.QLabel('Number of bins')
+		self.freq_hist_le = QtGui.QLineEdit()
+		self.freq_hist_le.setText('25')
+
+		freq_hist_hbox = QtGui.QHBoxLayout()
+		freq_hist_hbox.addWidget(freq_hist_label)
+		freq_hist_hbox.addWidget(self.freq_hist_le)
+		freq_hist_hbox.addStretch(1)
+
+		freq_hist_group_box = QtGui.QGroupBox('Frequency Histogram Configuration')
+		freq_hist_group_box.setLayout(freq_hist_hbox)
+
 		#Add TDMS button
 		add_tdms_button = QtGui.QPushButton('Add TDMS')
 		add_tdms_button.clicked.connect(self.add_tdms)
@@ -94,6 +107,7 @@ class EpilepsyGui(QtGui.QMainWindow):
 		self.vbox.addItem(self.grid)
 		self.vbox.addStretch(1)
 		self.vbox.addItem(hbox)
+		self.vbox.addWidget(freq_hist_group_box)
 		self.vbox.addWidget(fft_group_box)
 		self.vbox.addWidget(plot_group_box)
 
@@ -165,6 +179,8 @@ class EpilepsyGui(QtGui.QMainWindow):
 		plot_freq_hist = self.plot_freq_hist_box.isChecked()
 		plot_spec = self.plot_specgram_check_box.isChecked()
 
+		n_bins = int(self.freq_hist_le.text())
+
 		if self.fft_scale_db.isChecked():
 			fft_scale = 'db'
 		elif self.fft_scale_linear.isChecked():
@@ -187,7 +203,7 @@ class EpilepsyGui(QtGui.QMainWindow):
 		#ti = (int(ti_ini_le.text()), int(ti_fi_le.text()))
 
 		tdms.plot_all(plot_amp, plot_fft, plot_spec, plot_freq_hist, *plot_list,
-				fft_len=int(fft_len_le), ti=ti_list, fft_scale=fft_scale)
+				fft_len=int(fft_len_le), ti=ti_list, fft_scale=fft_scale, n_bins=n_bins)
 
 	def menuInit(self):
 		exitAction = QtGui.QAction(QtGui.QIcon('Close-2-icon.png'), '&Exit', self)
