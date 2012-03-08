@@ -115,6 +115,22 @@ def _plot(tdms, **kargs):
 def plot(*tdms):
 	_plot_all(tdms, _plot)
 
+def _plot_freq_hist(tdms, **kargs):
+	ti = kargs['ti']
+	fft_len = kargs['fft_len']
+	fft_scale = kargs['fft_scale']
+	p, f = plt.psd(tdms.wav.__getslice__(*ti),
+			fft_len,
+			tdms.fs)
+	if fft_scale == 'db':
+		plt.ylabel('Amplitude (mV)^2/Hz (dB)')
+	elif fft_scale == 'linear':
+		plt.cla()
+		plt.plot(f, p)
+		plt.ylabel('Amplitude (mV)^2/Hz')
+	plt.xlabel(u'Frequência (Hz)')
+	return
+
 def _plot_fft(tdms, **kargs):
 	ti = kargs['ti']
 	fft_len = kargs['fft_len']
@@ -166,7 +182,7 @@ def _plot_amp_and_fft(tdms, col):
 
 def _plot_any(tdms, col, plot_list, **kargs):
 	n_col = plot_list.count(True)
-	plot_func = [_plot, _plot_fft, _plot_specgram]
+	plot_func = [_plot, _plot_fft, _plot_specgram, _plot_freq_hist]
 	plt.title(path.basename(str(tdms.fn)))
 	if n_col == 1:
 		plot_func[plot_list.index(True)](tdms, **kargs)
@@ -196,8 +212,8 @@ def _plot_all(tdms, plot_func, cols=None, plot_list=None, **kargs):
 	plt.show()
 
 def plot_all(amplitude=False, fft=False,
-		specgram=False, *tdms, **kargs):
-	plot_list = [amplitude, fft, specgram]
+		specgram=False, hist=False, *tdms, **kargs):
+	plot_list = [amplitude, fft, specgram, hist]
 	cols = plot_list.count(True)
 	_plot_all(tdms, _plot_any, cols, plot_list, **kargs)
 

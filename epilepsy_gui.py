@@ -40,6 +40,7 @@ class EpilepsyGui(QtGui.QMainWindow):
 		self.plot_amplitude_check_box = QtGui.QCheckBox('Plot amplitude')
 		self.plot_fft_check_box = QtGui.QCheckBox('Plot the FFT')
 		self.plot_specgram_check_box = QtGui.QCheckBox('Plot the spectrogram')
+		self.plot_freq_hist_box = QtGui.QCheckBox('Plot frequency histogram')
 
 		plot_button = QtGui.QPushButton('Plot')
 		plot_button.clicked.connect(self.plot)
@@ -48,6 +49,7 @@ class EpilepsyGui(QtGui.QMainWindow):
 		plot_hbox.addWidget(self.plot_amplitude_check_box)
 		plot_hbox.addWidget(self.plot_fft_check_box)
 		plot_hbox.addWidget(self.plot_specgram_check_box)
+		plot_hbox.addWidget(self.plot_freq_hist_box)
 		plot_hbox.addStretch(1)
 		plot_hbox.addWidget(plot_button)
 
@@ -160,6 +162,7 @@ class EpilepsyGui(QtGui.QMainWindow):
 
 		plot_amp = self.plot_amplitude_check_box.isChecked()
 		plot_fft = self.plot_fft_check_box.isChecked()
+		plot_freq_hist = self.plot_freq_hist_box.isChecked()
 		plot_spec = self.plot_specgram_check_box.isChecked()
 
 		if self.fft_scale_db.isChecked():
@@ -183,7 +186,7 @@ class EpilepsyGui(QtGui.QMainWindow):
 		############
 		#ti = (int(ti_ini_le.text()), int(ti_fi_le.text()))
 
-		tdms.plot_all(plot_amp, plot_fft, plot_spec, *plot_list,
+		tdms.plot_all(plot_amp, plot_fft, plot_spec, plot_freq_hist, *plot_list,
 				fft_len=int(fft_len_le), ti=ti_list, fft_scale=fft_scale)
 
 	def menuInit(self):
