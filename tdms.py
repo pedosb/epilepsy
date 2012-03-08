@@ -118,15 +118,18 @@ def plot(*tdms):
 def _plot_fft(tdms, **kargs):
 	ti = kargs['ti']
 	fft_len = kargs['fft_len']
+	fft_scale = kargs['fft_scale']
 	p, f = plt.psd(tdms.wav.__getslice__(*ti),
 			fft_len,
 			tdms.fs)
-	plt.close()
-	plt.plot(f, p)
-	plt.ylabel('Amplitude (mV)^2/Hz')
+	if fft_scale == 'db':
+		plt.ylabel('Amplitude (mV)^2/Hz (dB)')
+	elif fft_scale == 'linear':
+		plt.cla()
+		plt.plot(f, p)
+		plt.ylabel('Amplitude (mV)^2/Hz')
 	plt.xlabel(u'Frequência (Hz)')
 	return
-	fft_unit = kargs['fft_unit']
 	fft = np.fft.fft(tdms.wav.__getslice__(*ti), fft_len)[:fft_len/2]
 
 	if fft_unit == 'pow':
