@@ -222,6 +222,10 @@ def _plot_all(tdms, plot_func, cols=None, plot_list=None, **kargs):
 				plot_func(t)
 	plt.show()
 
+def plot_joint_psd(tdms_list):
+	plt.plot(tdms_list[0].wav)
+	plt.show()
+
 def plot_all(amplitude=False, fft=False,
 		specgram=False, hist=False, *tdms, **kargs):
 	plot_list = [amplitude, fft, specgram, hist]

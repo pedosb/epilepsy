@@ -38,9 +38,10 @@ class EpilepsyGui(QtGui.QMainWindow):
 
 		#Plot Options group box
 		self.plot_amplitude_check_box = QtGui.QCheckBox('Plot amplitude')
-		self.plot_fft_check_box = QtGui.QCheckBox('Plot the FFT')
+		self.plot_fft_check_box = QtGui.QCheckBox('Plot the PSD')
 		self.plot_specgram_check_box = QtGui.QCheckBox('Plot the spectrogram')
 		self.plot_freq_hist_box = QtGui.QCheckBox('Plot frequency histogram')
+		self.plot_joint_psd_check_box = QtGui.QCheckBox('Plot joint PSD')
 
 		plot_button = QtGui.QPushButton('Plot')
 		plot_button.clicked.connect(self.plot)
@@ -50,6 +51,7 @@ class EpilepsyGui(QtGui.QMainWindow):
 		plot_hbox.addWidget(self.plot_fft_check_box)
 		plot_hbox.addWidget(self.plot_specgram_check_box)
 		plot_hbox.addWidget(self.plot_freq_hist_box)
+		plot_hbox.addWidget(self.plot_joint_psd_check_box)
 		plot_hbox.addStretch(1)
 		plot_hbox.addWidget(plot_button)
 
@@ -178,6 +180,7 @@ class EpilepsyGui(QtGui.QMainWindow):
 		plot_fft = self.plot_fft_check_box.isChecked()
 		plot_freq_hist = self.plot_freq_hist_box.isChecked()
 		plot_spec = self.plot_specgram_check_box.isChecked()
+		plot_joint_psd = self.plot_joint_psd_check_box.isChecked()
 
 		n_bins = int(self.freq_hist_le.text())
 
@@ -201,6 +204,9 @@ class EpilepsyGui(QtGui.QMainWindow):
 			c += 1
 		############
 		#ti = (int(ti_ini_le.text()), int(ti_fi_le.text()))
+
+		if plot_joint_psd:
+			tdms.plot_joint_psd(plot_list)
 
 		tdms.plot_all(plot_amp, plot_fft, plot_spec, plot_freq_hist, *plot_list,
 				fft_len=int(fft_len_le), ti=ti_list, fft_scale=fft_scale, n_bins=n_bins)
