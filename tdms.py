@@ -21,8 +21,14 @@
 
 import argparse
 import matplotlib.pyplot as plt
+from matplotlib import rc
 import numpy as np
 from os import path
+
+rc('text', usetex=True)
+rc('font', family='serif')
+rc('text.latex', unicode=True)
+rc('font', serif='Computer Modern Roman')
 
 def file_len(f):
 	"""
@@ -75,8 +81,8 @@ class Tdms():
 			if line == '' or (c > self.stop and self.stop > 0):
 				break
 #			self.data.append([float(n) for n in line.split('\t')])
-			i, j = line.split('\t')
-			self.wav[c] = float(i) - float(j)
+			i = line.split('\t')[-1]
+			self.wav[c] = float(i)
 
 		self.size = len(self.wav)
 		if self.size < self.stop - self.start:
@@ -110,7 +116,7 @@ def _plot(tdms, **kargs):
 		tdms.wav[ti[0]:ti[1]])
 	plt.grid()
 	plt.xlabel('Tempo (segundos)')
-	plt.ylabel('Amplitude')
+	plt.ylabel('Amplitude ($mV$)')
 
 def plot(*tdms):
 	_plot_all(tdms, _plot)
@@ -144,12 +150,12 @@ def _plot_fft(tdms, **kargs):
 			fft_len,
 			tdms.fs)
 	if fft_scale == 'db':
-		plt.ylabel('Amplitude (mV)^2/Hz (dB)')
+		plt.ylabel(r'Amplitude $\frac{mV^2}{Hz}$ ($dB$)')
 	elif fft_scale == 'linear':
 		plt.cla()
 		plt.plot(f, p)
-		plt.ylabel('Amplitude (mV)^2/Hz')
-	plt.xlabel(u'Frequência (Hz)')
+		plt.ylabel(r'Amplitude $\frac{mV^2}{Hz}$')
+	plt.xlabel(u'Frequência ($Hz$)')
 	return
 	fft = np.fft.fft(tdms.wav.__getslice__(*ti), fft_len)[:fft_len/2]
 
@@ -169,7 +175,7 @@ def _plot_specgram(tdms, **kargs):
 	ti = kargs['ti']
 	plt.specgram(tdms.wav.__getslice__(*ti), Fs=tdms.fs)
 	plt.xlabel('Tempo (segundos)')
-	plt.ylabel(u'Frequência (Hz)')
+	plt.ylabel(u'FrequÃÂªncia (Hz)')
 	plt.grid()
 	plt.colorbar()
 
