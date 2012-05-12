@@ -29,6 +29,7 @@ class EpilepsyGui(QtGui.QMainWindow):
 
 		self.tdms_list = list()
 		self.stop_time_str = 'Stop time (max %d)'
+		self.stop_frequency_str = 'Stop frequency (max %d)'
 
 		self.initUI()
 		self.statusBar().showMessage('Ready')
@@ -70,16 +71,36 @@ class EpilepsyGui(QtGui.QMainWindow):
 		fft_unit_vbox = QtGui.QVBoxLayout()
 		fft_unit_vbox.addWidget(self.fft_scale_db)
 		fft_unit_vbox.addWidget(self.fft_scale_linear)
-		fft_group_box = QtGui.QGroupBox('Scale')
-		fft_group_box.setLayout(fft_unit_vbox)
+		psd_group_box = QtGui.QGroupBox('Scale')
+		psd_group_box.setLayout(fft_unit_vbox)
 
 		fft_hbox = QtGui.QHBoxLayout()
 		fft_hbox.addWidget(fft_label)
 		fft_hbox.addWidget(self.fft_le)
-		fft_hbox.addWidget(fft_group_box)
+		fft_hbox.addWidget(psd_group_box)
 		fft_hbox.addStretch(1)
-		fft_group_box = QtGui.QGroupBox('PSD Configuration')
-		fft_group_box.setLayout(fft_hbox)
+		psd_group_box = QtGui.QGroupBox('PSD Configuration')
+		psd_group_box.setLayout(fft_hbox)
+
+		#Joint PSD configuration group box
+		joint_psd_group_box = QtGui.QGroupBox('Joint PSD Configuration')
+		joint_psd_grid_layout = QtGui.QGridLayout(self.centralWidget())
+		frequency_interval_start_label = QtGui.QLabel('Start Frequency',
+				self.centralWidget())
+		self.frequency_interval_start_le = QtGui.QLineEdit(self.centralWidget())
+		self.frequency_interval_stop_label = QtGui.QLabel('Stop Frequency',
+				self.centralWidget())
+		self.frequency_interval_stop_le = QtGui.QLineEdit()
+		joint_psd_grid_layout.addWidget(frequency_interval_start_label, 0, 0)
+		joint_psd_grid_layout.addWidget(self.frequency_interval_start_le, 0, 1)
+		joint_psd_grid_layout.addWidget(self.frequency_interval_stop_label, 1, 0)
+		joint_psd_grid_layout.addWidget(self.frequency_interval_stop_le, 1, 1)
+		joint_psd_group_box.setLayout(joint_psd_grid_layout)
+
+		#PSD and Joint PSD configuration HBox
+		psd_and_joint_hbox = QtGui.QHBoxLayout()
+		psd_and_joint_hbox.addWidget(psd_group_box)
+		psd_and_joint_hbox.addWidget(joint_psd_group_box)
 
 		#Histogram configuration group box
 		freq_hist_label = QtGui.QLabel('Number of bins')
@@ -110,7 +131,7 @@ class EpilepsyGui(QtGui.QMainWindow):
 		self.vbox.addStretch(1)
 		self.vbox.addItem(hbox)
 		self.vbox.addWidget(freq_hist_group_box)
-		self.vbox.addWidget(fft_group_box)
+		self.vbox.addItem(psd_and_joint_hbox)
 		self.vbox.addWidget(plot_group_box)
 
 		centralWidget = QtGui.QWidget()
@@ -171,16 +192,23 @@ class EpilepsyGui(QtGui.QMainWindow):
 			ti_fi_label.setText(
 					self.stop_time_str % (len(tdms_file.wav)/tdms_file.fs))
 
+			self.frequency_interval_stop_label.setText(self.stop_frequency_str %
+					(tdms_file.fs / 2))
+
 			self.statusBar().showMessage('Ready')
 
 	def plot(self):
-		fft_len_le = self.fft_le.text()
+		fft_len_le = int(self.fft_le.text())
 
 		plot_amp = self.plot_amplitude_check_box.isChecked()
 		plot_fft = self.plot_fft_check_box.isChecked()
 		plot_freq_hist = self.plot_freq_hist_box.isChecked()
 		plot_spec = self.plot_specgram_check_box.isChecked()
 		plot_joint_psd = self.plot_joint_psd_check_box.isChecked()
+		ti_start = self.frequency_interval_start_le.text()
+		ti_stop = self.frequency_interval_stop_le.text()
+		frequency_interval = (float(ti_start) if ti_start != '' else None,
+				float(ti_stop) if ti_stop != '' else None)
 
 		n_bins = int(self.freq_hist_le.text())
 
@@ -206,10 +234,11 @@ class EpilepsyGui(QtGui.QMainWindow):
 		#ti = (int(ti_ini_le.text()), int(ti_fi_le.text()))
 
 		if plot_joint_psd:
-			tdms.plot_joint_psd(plot_list)
+			tdms.plot_joint_psd(plot_list, ti_list, fft_len=fft_len_le,
+					fft_scale=fft_scale, fi=frequency_interval)
 
 		tdms.plot_all(plot_amp, plot_fft, plot_spec, plot_freq_hist, *plot_list,
-				fft_len=int(fft_len_le), ti=ti_list, fft_scale=fft_scale, n_bins=n_bins)
+				fft_len=fft_len_le, ti=ti_list, fft_scale=fft_scale, n_bins=n_bins)
 
 	def menuInit(self):
 		exitAction = QtGui.QAction(QtGui.QIcon('Close-2-icon.png'), '&Exit', self)

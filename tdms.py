@@ -222,8 +222,34 @@ def _plot_all(tdms, plot_func, cols=None, plot_list=None, **kargs):
 				plot_func(t)
 	plt.show()
 
-def plot_joint_psd(tdms_list):
-	plt.plot(tdms_list[0].wav)
+def plot_joint_psd(tdms_list, ti_list, fft_len=256, fft_scale='db', fi=None):
+	min_len = np.inf
+	for tdms in tdms_list:
+		if len(tdms.wav) < min_len:
+			min_len = len(tdms.wav)
+	psd_len = fft_len / 2 + 1
+	data = np.zeros((len(tdms_list), psd_len))
+	for tdms, ti, i, in zip(tdms_list, ti_list, xrange(len(tdms_list))):
+		ti = (int(ti[0] * tdms.fs), int(ti[1] * tdms.fs))
+		t = tdms.wav.__getslice__(*ti)
+		data[i], f_list = plt.psd(t, fft_len, Fs=tdms.fs)
+	if fft_scale == 'db':
+		data = 10 * np.log10(data)
+	if fi != None:
+		fi = (fi[0] if fi[0] is not None else 0,
+				fi[1] if fi[1] is not None else tdms_list[0].fs / 2)
+		f_start_idx = None
+		f_stop_idx = None
+		for f, i in zip(f_list, xrange(len(f_list))):
+			if f_start_idx is None and f > fi[0]:
+				f_start_idx = i - 1
+			if f_stop_idx is None and f > fi[1]:
+				f_stop_idx = i - 1
+		f_list = f_list[f_start_idx:f_stop_idx]
+		data = data[:,f_start_idx:f_stop_idx]
+	plt.cla()
+	plt.errorbar(f_list, data.mean(0), data.std(0))
+	plt.xlim((min(f_list), max(f_list)))
 	plt.show()
 
 def plot_all(amplitude=False, fft=False,
