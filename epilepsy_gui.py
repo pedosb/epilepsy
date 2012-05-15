@@ -28,8 +28,13 @@ class EpilepsyGui(QtGui.QMainWindow):
 		super(EpilepsyGui, self).__init__()
 
 		self.tdms_list = list()
-		self.stop_time_str = 'Stop time (max %d)'
+		self.joint_button_list = list()
+
+		self.stop_time_str = '(max %d)'
 		self.stop_frequency_str = 'Stop frequency (max %d)'
+
+		self.group_len = 3
+		self.group_ini_col = 5
 
 		self.initUI()
 		self.statusBar().showMessage('Ready')
@@ -124,6 +129,12 @@ class EpilepsyGui(QtGui.QMainWindow):
 		#Grid layout for tdms intput files
 		self.grid = QtGui.QGridLayout()
 		self.grid.setSpacing(10)
+		self.grid.addWidget(QtGui.QLabel('TDMS file'), 0, 0)
+		self.grid.addWidget(QtGui.QLabel('Start time'), 0, 2)
+		self.grid.addWidget(QtGui.QLabel('Stop time'), 0, 4)
+		for i in xrange(self.group_len):
+			self.grid.addWidget(QtGui.QLabel('Grupo %d' % i), 0,
+					self.group_ini_col + i)
 
 		#Main Vertical Box
 		self.vbox = QtGui.QVBoxLayout()
@@ -142,13 +153,13 @@ class EpilepsyGui(QtGui.QMainWindow):
 		self.setWindowTitle('Epilepsy plot')
 
 	def add_tdms(self):
-		label = QtGui.QLabel('TDMS File:', self.centralWidget())
+#		label = QtGui.QLabel('TDMS File:', self.centralWidget())
 		le = QtGui.QLineEdit(self.centralWidget())
 		button = QtGui.QPushButton('Browse', self.centralWidget())
 
-		ti_ini_label = QtGui.QLabel('Start time ', self.centralWidget())
+#		ti_ini_label = QtGui.QLabel('Start time ', self.centralWidget())
 		ti_ini_le = QtGui.QLineEdit(self.centralWidget())
-		ti_fi_label = QtGui.QLabel('Stop time', self.centralWidget())
+		ti_fi_label = QtGui.QLabel('', self.centralWidget())
 		ti_fi_le = QtGui.QLineEdit(self.centralWidget())
 
 		button.clicked.connect(
@@ -156,20 +167,30 @@ class EpilepsyGui(QtGui.QMainWindow):
 
 		line_n = self.grid.rowCount()
 
-		self.grid.addWidget(label, line_n, 0)
-		self.grid.addWidget(le, line_n, 1)
-		self.grid.addWidget(button, line_n, 2)
-		self.grid.addWidget(ti_ini_label, line_n, 3)
-		self.grid.addWidget(ti_ini_le, line_n, 4)
-		self.grid.addWidget(ti_fi_label, line_n, 5)
-		self.grid.addWidget(ti_fi_le, line_n, 6)
+#		self.grid.addWidget(label, line_n, 0)
+		self.grid.addWidget(le, line_n, 0)
+		self.grid.addWidget(button, line_n, 1)
+#		self.grid.addWidget(ti_ini_label, line_n, 3)
+		self.grid.addWidget(ti_ini_le, line_n, 2)
+		self.grid.addWidget(ti_fi_label, line_n, 3)
+		self.grid.addWidget(ti_fi_le, line_n, 4)
+
+		button_group = QtGui.QButtonGroup(self.centralWidget())
+		for i in xrange(self.group_len):
+			new_button = QtGui.QRadioButton(self.centralWidget())
+			if i == 0:
+				new_button.setChecked(True)
+			button_group.addButton(new_button, i)
+			self.grid.addWidget(new_button, line_n, self.group_ini_col + i)
+			new_button.show()
 
 		self.tdms_list.append(None)
+		self.joint_button_list.append(button_group)
 
-		label.show()
+#		label.show()
 		le.show()
 		button.show()
-		ti_ini_label.show()
+#		ti_ini_label.show()
 		ti_ini_le.show()
 		ti_fi_label.show()
 		ti_fi_le.show()
@@ -221,11 +242,12 @@ class EpilepsyGui(QtGui.QMainWindow):
 		plot_list = list()
 		ti_list = list()
 		c = 0
-		for t in self.tdms_list:
+		for t, button_group in zip(self.tdms_list, self.joint_button_list):
 			if t is not None:
 				plot_list.append(t)
-				ini = self.grid.itemAtPosition(c+1, 4).widget().text()
-				fi = self.grid.itemAtPosition(c+1, 6).widget().text()
+				t.group_id = button_group.checkedId()
+				ini = self.grid.itemAtPosition(c+1, 2).widget().text()
+				fi = self.grid.itemAtPosition(c+1, 4).widget().text()
 				ti_list.append((
 					int(ini) if ini != '' else 0,
 					int(fi) if fi != '' else float(len(t.wav))/t.fs))
