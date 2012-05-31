@@ -115,7 +115,7 @@ def _plot(tdms, **kargs):
 	plt.plot(x,
 		tdms.wav[ti[0]:ti[1]])
 	plt.grid()
-	plt.xlabel('Tempo (segundos)')
+	plt.xlabel('Time (s)')
 	plt.ylabel('Amplitude ($mV$)')
 
 def plot(*tdms):
@@ -155,7 +155,7 @@ def _plot_fft(tdms, **kargs):
 		plt.cla()
 		plt.plot(f, p)
 		plt.ylabel(r'Amplitude $\frac{mV^2}{Hz}$')
-	plt.xlabel(u'Frequência ($Hz$)')
+	plt.xlabel(u'Frequency ($Hz$)')
 	return
 	fft = np.fft.fft(tdms.wav.__getslice__(*ti), fft_len)[:fft_len/2]
 
@@ -174,8 +174,8 @@ def plot_fft(*tdms):
 def _plot_specgram(tdms, **kargs):
 	ti = kargs['ti']
 	plt.specgram(tdms.wav.__getslice__(*ti), Fs=tdms.fs)
-	plt.xlabel('Tempo (segundos)')
-	plt.ylabel(u'FrequÃÂªncia (Hz)')
+	plt.xlabel('Time (segundos)')
+	plt.ylabel(u'Frequency (Hz)')
 	plt.grid()
 	plt.colorbar()
 
