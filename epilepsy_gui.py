@@ -260,7 +260,7 @@ class EpilepsyGui(QtGui.QMainWindow):
 					fft_scale=fft_scale, fi=frequency_interval)
 
 		tdms.plot_all(plot_amp, plot_fft, plot_spec, plot_freq_hist, *plot_list,
-				fft_len=fft_len_le, ti=ti_list, fft_scale=fft_scale, n_bins=n_bins)
+				fft_len=fft_len_le, ti=ti_list, fi=frequency_interval, fft_scale=fft_scale, n_bins=n_bins)
 
 	def menuInit(self):
 		exitAction = QtGui.QAction(QtGui.QIcon('Close-2-icon.png'), '&Exit', self)
