@@ -123,6 +123,7 @@ def plot(*tdms):
 
 def _plot_freq_hist(tdms, **kargs):
 	ti = kargs['ti']
+	fi = kargs['fi']
 	fft_len = kargs['fft_len']
 	fft_scale = kargs['fft_scale']
 	n_bins = kargs['n_bins']
@@ -131,6 +132,20 @@ def _plot_freq_hist(tdms, **kargs):
 	s, f = plt.psd(tdms.wav.__getslice__(*ti),
 			fft_len,
 			tdms.fs)
+	sfi = None
+	ffi = None
+	for v, i in zip(f, xrange(len(f))):
+		if fi[0] is not None and v > fi[0]:
+			if sfi is None:
+				sfi = i
+		if fi[1] is not None and v > fi[1]:
+			ffi = i
+			break
+	if sfi is None:
+		sfi = 0
+	if ffi is None:
+		ffi = len(f)
+	s = s[sfi:ffi]
 	plt.cla()
 #	s = tdms.wav.__getslice__(*ti)
 	t = sum(s)
@@ -140,7 +155,7 @@ def _plot_freq_hist(tdms, **kargs):
 		step = i * m + (i if i < r else r)
 		b = step, step + m + (1 if i < r else 0)
 #		bins.append(b, sum(s.__getslice__(*b)))
-		plt.bar(b[0], sum(s.__getslice__(*b))/t, b[1] - b[0])
+		plt.bar(b[0] + sfi, sum(s.__getslice__(*b))/t, b[1] - b[0])
 
 def _plot_fft(tdms, **kargs):
 	ti = kargs['ti']
@@ -220,6 +235,7 @@ def _plot_all(tdms, plot_func, cols=None, plot_list=None, **kargs):
 				plot_func(t, col, plot_list, ti=i, **kargs)
 			else:
 				plot_func(t)
+	plt.savefig("out.png")
 	plt.show()
 
 def plot_joint_psd(tdms_list, ti_list, fft_len=256, fft_scale='db', fi=None):
@@ -258,6 +274,7 @@ def plot_joint_psd(tdms_list, ti_list, fft_len=256, fft_scale='db', fi=None):
 		data = data[:,f_start_idx:f_stop_idx]
 		plt.errorbar(f_list, data.mean(0), data.std(0))
 	plt.xlim((min(f_list), max(f_list)))
+	plt.savefig("out.png")
 	plt.show()
 
 def plot_all(amplitude=False, fft=False,
