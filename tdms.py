@@ -238,7 +238,7 @@ def _plot_all(tdms, plot_func, cols=None, plot_list=None, **kargs):
 	plt.savefig("out.png")
 	plt.show()
 
-def plot_joint_psd(tdms_list, ti_list, fft_len=256, fft_scale='db', fi=None):
+def plot_joint_psd(tdms_list, ti_list, fft_len=256, fft_scale='db', fi=None, bar=False):
 	psd_len = fft_len / 2 + 1
 #	data_list = np.zeros((len(tdms_list), psd_len))
 	data_dict = dict()
@@ -270,10 +270,22 @@ def plot_joint_psd(tdms_list, ti_list, fft_len=256, fft_scale='db', fi=None):
 		f_list = f_list[f_start_idx:f_stop_idx]
 
 	plt.cla()
-	for data in data_dict.itervalues():
+	xticks_list = ([], [])
+	for key, data, i in zip(data_dict.iterkeys(), data_dict.itervalues(), xrange(len(data_dict))):
 		data = data[:,f_start_idx:f_stop_idx]
-		plt.errorbar(f_list, data.mean(0), data.std(0))
-	plt.xlim((min(f_list), max(f_list)))
+		if bar:
+			plt.bar(i+0.1, data.sum())
+			xticks_list[0].append(i+0.5)
+			xticks_list[1].append(key)
+		else:
+			plt.errorbar(f_list, data.mean(0), data.std(0), label=str(key))
+	if bar:
+		plt.xlim((0, len(data_dict)))
+		plt.xticks(*xticks_list)
+		print xticks_list
+	else:
+		plt.legend()
+		plt.xlim((min(f_list), max(f_list)))
 	plt.savefig("out.png")
 	plt.show()
 

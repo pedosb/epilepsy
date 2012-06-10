@@ -29,6 +29,7 @@ class EpilepsyGui(QtGui.QMainWindow):
 
 		self.tdms_list = list()
 		self.joint_button_list = list()
+		self.joint_le_list = list()
 
 		self.stop_time_str = '(max %d)'
 		self.stop_frequency_str = 'Stop frequency (max %d)'
@@ -96,11 +97,15 @@ class EpilepsyGui(QtGui.QMainWindow):
 		self.frequency_interval_stop_label = QtGui.QLabel('Stop Frequency',
 				self.centralWidget())
 		self.frequency_interval_stop_le = QtGui.QLineEdit()
+		self.joint_psb_bar_check_box = QtGui.QCheckBox("Plot bars")
 		joint_psd_grid_layout.addWidget(frequency_interval_start_label, 0, 0)
 		joint_psd_grid_layout.addWidget(self.frequency_interval_start_le, 0, 1)
 		joint_psd_grid_layout.addWidget(self.frequency_interval_stop_label, 1, 0)
 		joint_psd_grid_layout.addWidget(self.frequency_interval_stop_le, 1, 1)
-		joint_psd_group_box.setLayout(joint_psd_grid_layout)
+		joint_psd_vbox = QtGui.QVBoxLayout()
+		joint_psd_vbox.addItem(joint_psd_grid_layout)
+		joint_psd_vbox.addWidget(self.joint_psb_bar_check_box)
+		joint_psd_group_box.setLayout(joint_psd_vbox)
 
 		#PSD and Joint PSD configuration HBox
 		psd_and_joint_hbox = QtGui.QHBoxLayout()
@@ -133,7 +138,9 @@ class EpilepsyGui(QtGui.QMainWindow):
 		self.grid.addWidget(QtGui.QLabel('Start time'), 0, 2)
 		self.grid.addWidget(QtGui.QLabel('Stop time'), 0, 4)
 		for i in xrange(self.group_len):
-			self.grid.addWidget(QtGui.QLabel('Grupo %d' % i), 0,
+			new_le = QtGui.QLineEdit('Grupo %d' % i)
+			self.joint_le_list.append(new_le)
+			self.grid.addWidget(new_le, 0,
 					self.group_ini_col + i)
 
 		#Main Vertical Box
@@ -226,6 +233,7 @@ class EpilepsyGui(QtGui.QMainWindow):
 		plot_freq_hist = self.plot_freq_hist_box.isChecked()
 		plot_spec = self.plot_specgram_check_box.isChecked()
 		plot_joint_psd = self.plot_joint_psd_check_box.isChecked()
+		joint_psb_bar = self.joint_psb_bar_check_box.isChecked()
 		ti_start = self.frequency_interval_start_le.text()
 		ti_stop = self.frequency_interval_stop_le.text()
 		frequency_interval = (float(ti_start) if ti_start != '' else None,
@@ -245,7 +253,7 @@ class EpilepsyGui(QtGui.QMainWindow):
 		for t, button_group in zip(self.tdms_list, self.joint_button_list):
 			if t is not None:
 				plot_list.append(t)
-				t.group_id = button_group.checkedId()
+				t.group_id = self.joint_le_list[button_group.checkedId()].text()
 				ini = self.grid.itemAtPosition(c+1, 2).widget().text()
 				fi = self.grid.itemAtPosition(c+1, 4).widget().text()
 				ti_list.append((
@@ -257,7 +265,7 @@ class EpilepsyGui(QtGui.QMainWindow):
 
 		if plot_joint_psd:
 			tdms.plot_joint_psd(plot_list, ti_list, fft_len=fft_len_le,
-					fft_scale=fft_scale, fi=frequency_interval)
+					fft_scale=fft_scale, fi=frequency_interval, bar=joint_psb_bar)
 
 		tdms.plot_all(plot_amp, plot_fft, plot_spec, plot_freq_hist, *plot_list,
 				fft_len=fft_len_le, ti=ti_list, fi=frequency_interval, fft_scale=fft_scale, n_bins=n_bins)
