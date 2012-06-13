@@ -274,7 +274,9 @@ def plot_joint_psd(tdms_list, ti_list, fft_len=256, fft_scale='db', fi=None, bar
 	for key, data, i in zip(data_dict.iterkeys(), data_dict.itervalues(), xrange(len(data_dict))):
 		data = data[:,f_start_idx:f_stop_idx]
 		if bar:
-			plt.bar(i+0.1, data.sum())
+			data_sum = data.sum(1)
+			plt.bar(i+0.1, data_sum.mean(), yerr=data_sum.std(),
+					error_kw=dict(linewidth=6, ecolor='green'))
 			xticks_list[0].append(i+0.5)
 			xticks_list[1].append(key)
 		else:
