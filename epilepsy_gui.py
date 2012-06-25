@@ -22,6 +22,7 @@
 import sys
 from PyQt4 import QtGui
 import tdms
+from matplotlib import rc as mplrc
 
 class EpilepsyGui(QtGui.QMainWindow):
 	def __init__(self):
@@ -141,6 +142,11 @@ class EpilepsyGui(QtGui.QMainWindow):
 		self.figure_resolution_le = QtGui.QLineEdit('80')
 		figure_resolution_hbox.addWidget(self.figure_resolution_le)
 
+		figure_font_size_hbox = QtGui.QHBoxLayout()
+		figure_font_size_hbox.addWidget(QtGui.QLabel('Font size (pts) '))
+		self.figure_font_size_le = QtGui.QLineEdit('12')
+		figure_font_size_hbox.addWidget(self.figure_font_size_le)
+
 		figure_out_hbox = QtGui.QHBoxLayout()
 		figure_out_button = QtGui.QPushButton('Save Figure')
 		figure_out_button.clicked.connect(self.save_figure)
@@ -149,6 +155,7 @@ class EpilepsyGui(QtGui.QMainWindow):
 		figure_vbox = QtGui.QVBoxLayout()
 		figure_vbox.addItem(figure_size_hbox)
 		figure_vbox.addItem(figure_resolution_hbox)
+		figure_vbox.addItem(figure_font_size_hbox)
 		figure_vbox.addItem(figure_out_hbox)
 
 		figure_group_box = QtGui.QGroupBox('Figure Options')
@@ -262,7 +269,14 @@ class EpilepsyGui(QtGui.QMainWindow):
 			self.output_fn = str(file_name)
 			self.plot()
 
+	def configure_matplotlib(self):
+		mplrc('savefig', dpi=float(self.figure_resolution_le.text()))
+		mplrc('font', size=float(self.figure_font_size_le.text()))
+
 	def plot(self):
+
+		self.configure_matplotlib()
+
 		fft_len_le = int(self.fft_le.text())
 
 		plot_amp = self.plot_amplitude_check_box.isChecked()
