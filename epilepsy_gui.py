@@ -257,8 +257,8 @@ class EpilepsyGui(QtGui.QMainWindow):
 				ini = self.grid.itemAtPosition(c+1, 2).widget().text()
 				fi = self.grid.itemAtPosition(c+1, 4).widget().text()
 				ti_list.append((
-					int(ini) if ini != '' else 0,
-					int(fi) if fi != '' else float(len(t.wav))/t.fs))
+					float(ini) if ini != '' else 0,
+					float(fi) if fi != '' else float(len(t.wav))/t.fs))
 			c += 1
 		############
 		#ti = (int(ti_ini_le.text()), int(ti_fi_le.text()))
