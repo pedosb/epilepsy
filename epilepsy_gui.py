@@ -40,6 +40,8 @@ class EpilepsyGui(QtGui.QMainWindow):
 		self.initUI()
 		self.statusBar().showMessage('Ready')
 
+		self.output_fn = None
+
 	def initUI(self):
 		self.menuInit()
 
@@ -125,6 +127,33 @@ class EpilepsyGui(QtGui.QMainWindow):
 		freq_hist_group_box = QtGui.QGroupBox('Frequency Histogram Configuration')
 		freq_hist_group_box.setLayout(freq_hist_hbox)
 
+		#Figure options group box
+		figure_size_hbox = QtGui.QHBoxLayout()
+		figure_size_hbox.addWidget(QtGui.QLabel('Figure Size (in) '))
+		self.figure_size_wid_le = QtGui.QLineEdit('8')
+		self.figure_size_hei_le = QtGui.QLineEdit('6')
+		figure_size_hbox.addWidget(self.figure_size_wid_le)
+		figure_size_hbox.addWidget(QtGui.QLabel('X'))
+		figure_size_hbox.addWidget(self.figure_size_hei_le)
+
+		figure_resolution_hbox = QtGui.QHBoxLayout()
+		figure_resolution_hbox.addWidget(QtGui.QLabel('Figure resolution (dpi) '))
+		self.figure_resolution_le = QtGui.QLineEdit('80')
+		figure_resolution_hbox.addWidget(self.figure_resolution_le)
+
+		figure_out_hbox = QtGui.QHBoxLayout()
+		figure_out_button = QtGui.QPushButton('Save Figure')
+		figure_out_button.clicked.connect(self.save_figure)
+		figure_out_hbox.addWidget(figure_out_button)
+
+		figure_vbox = QtGui.QVBoxLayout()
+		figure_vbox.addItem(figure_size_hbox)
+		figure_vbox.addItem(figure_resolution_hbox)
+		figure_vbox.addItem(figure_out_hbox)
+
+		figure_group_box = QtGui.QGroupBox('Figure Options')
+		figure_group_box.setLayout(figure_vbox)
+
 		#Add TDMS button
 		add_tdms_button = QtGui.QPushButton('Add TDMS')
 		add_tdms_button.clicked.connect(self.add_tdms)
@@ -148,6 +177,7 @@ class EpilepsyGui(QtGui.QMainWindow):
 		self.vbox.addItem(self.grid)
 		self.vbox.addStretch(1)
 		self.vbox.addItem(hbox)
+		self.vbox.addWidget(figure_group_box)
 		self.vbox.addWidget(freq_hist_group_box)
 		self.vbox.addItem(psd_and_joint_hbox)
 		self.vbox.addWidget(plot_group_box)
@@ -225,6 +255,13 @@ class EpilepsyGui(QtGui.QMainWindow):
 
 			self.statusBar().showMessage('Ready')
 
+	def save_figure(self):
+		file_name = QtGui.QFileDialog.getSaveFileName(self, 'Save Figure',
+				filter='Images (*.png)')
+		if file_name != '':
+			self.output_fn = str(file_name)
+			self.plot()
+
 	def plot(self):
 		fft_len_le = int(self.fft_le.text())
 
@@ -238,6 +275,10 @@ class EpilepsyGui(QtGui.QMainWindow):
 		ti_stop = self.frequency_interval_stop_le.text()
 		frequency_interval = (float(ti_start) if ti_start != '' else None,
 				float(ti_stop) if ti_stop != '' else None)
+
+		figure_size = (float(self.figure_size_wid_le.text()),
+				float(self.figure_size_hei_le.text()))
+		figure_resolution = float(self.figure_resolution_le.text())
 
 		n_bins = int(self.freq_hist_le.text())
 
@@ -260,16 +301,20 @@ class EpilepsyGui(QtGui.QMainWindow):
 					float(ini) if ini != '' else 0,
 					float(fi) if fi != '' else float(len(t.wav))/t.fs))
 			c += 1
-		############
-		#ti = (int(ti_ini_le.text()), int(ti_fi_le.text()))
 
 		if plot_joint_psd:
 			tdms.plot_joint_psd(plot_list, ti_list, fft_len=fft_len_le,
-					fft_scale=fft_scale, fi=frequency_interval, bar=joint_psb_bar)
+					fft_scale=fft_scale, fi=frequency_interval,
+					bar=joint_psb_bar, figure_size=figure_size,
+					output_fn=self.output_fn,
+					figure_resolution=figure_resolution)
 
 		if any((plot_amp, plot_fft, plot_spec, plot_freq_hist)):
 			tdms.plot_all(plot_amp, plot_fft, plot_spec, plot_freq_hist, *plot_list,
-					fft_len=fft_len_le, ti=ti_list, fi=frequency_interval, fft_scale=fft_scale, n_bins=n_bins)
+					fft_len=fft_len_le, ti=ti_list, fi=frequency_interval,
+					fft_scale=fft_scale, n_bins=n_bins, figure_size=figure_size,
+					output_fn=self.output_fn,
+					figure_resolution=figure_resolution)
 
 	def menuInit(self):
 		exitAction = QtGui.QAction(QtGui.QIcon('Close-2-icon.png'), '&Exit', self)

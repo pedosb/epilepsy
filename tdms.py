@@ -224,6 +224,9 @@ def _plot_any(tdms, col, plot_list, **kargs):
 		plot_func[col-1](tdms, **kargs)
 
 def _plot_all(tdms, plot_func, cols=None, plot_list=None, **kargs):
+
+	plt.figure(figsize=kargs['figure_size'], dpi=kargs['figure_resolution'])
+
 	lines = len(tdms)
 	c = 0
 	ti_list = kargs['ti']
@@ -237,10 +240,15 @@ def _plot_all(tdms, plot_func, cols=None, plot_list=None, **kargs):
 				plot_func(t, col, plot_list, ti=i, **kargs)
 			else:
 				plot_func(t)
-	plt.savefig("out.png")
+	if kargs['output_fn'] is not None:
+		plt.savefig(kargs['output_fn'])
 	plt.show()
 
-def plot_joint_psd(tdms_list, ti_list, fft_len=256, fft_scale='db', fi=None, bar=False):
+def plot_joint_psd(tdms_list, ti_list, fft_len=256, fft_scale='db', fi=None,
+		bar=False, figure_size=(8,6), output_fn=None, figure_resolution=80):
+
+	plt.figure(figsize=figure_size, dpi=figure_resolution)
+
 	psd_len = fft_len / 2 + 1
 #	data_list = np.zeros((len(tdms_list), psd_len))
 	data_dict = dict()
@@ -296,7 +304,8 @@ def plot_joint_psd(tdms_list, ti_list, fft_len=256, fft_scale='db', fi=None, bar
 	else:
 		plt.legend()
 		plt.xlim((min(f_list), max(f_list)))
-	plt.savefig("out.png")
+	if output_fn is not None:
+		plt.savefig(output_fn)
 	plt.show()
 
 def plot_all(amplitude=False, fft=False,
