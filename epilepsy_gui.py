@@ -267,8 +267,9 @@ class EpilepsyGui(QtGui.QMainWindow):
 			tdms.plot_joint_psd(plot_list, ti_list, fft_len=fft_len_le,
 					fft_scale=fft_scale, fi=frequency_interval, bar=joint_psb_bar)
 
-		tdms.plot_all(plot_amp, plot_fft, plot_spec, plot_freq_hist, *plot_list,
-				fft_len=fft_len_le, ti=ti_list, fi=frequency_interval, fft_scale=fft_scale, n_bins=n_bins)
+		if any((plot_amp, plot_fft, plot_spec, plot_freq_hist)):
+			tdms.plot_all(plot_amp, plot_fft, plot_spec, plot_freq_hist, *plot_list,
+					fft_len=fft_len_le, ti=ti_list, fi=frequency_interval, fft_scale=fft_scale, n_bins=n_bins)
 
 	def menuInit(self):
 		exitAction = QtGui.QAction(QtGui.QIcon('Close-2-icon.png'), '&Exit', self)

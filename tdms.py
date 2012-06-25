@@ -156,6 +156,8 @@ def _plot_freq_hist(tdms, **kargs):
 		b = step, step + m + (1 if i < r else 0)
 #		bins.append(b, sum(s.__getslice__(*b)))
 		plt.bar(b[0] + sfi, sum(s.__getslice__(*b))/t, b[1] - b[0])
+	plt.ylabel(r'Amplitude $\frac{mV^2}{Hz}$')
+	plt.xlabel(u'Frequency ($Hz$)')
 
 def _plot_fft(tdms, **kargs):
 	ti = kargs['ti']
@@ -270,6 +272,12 @@ def plot_joint_psd(tdms_list, ti_list, fft_len=256, fft_scale='db', fi=None, bar
 		f_list = f_list[f_start_idx:f_stop_idx]
 
 	plt.cla()
+	if fft_scale == 'db':
+		plt.ylabel(r'Amplitude $\frac{mV^2}{Hz}$ ($dB$)')
+	elif fft_scale == 'linear':
+		plt.ylabel(r'Amplitude $\frac{mV^2}{Hz}$')
+	plt.xlabel(u'Frequency ($Hz$)')
+
 	xticks_list = ([], [])
 	for key, data, i in zip(data_dict.iterkeys(), data_dict.itervalues(), xrange(len(data_dict))):
 		data = data[:,f_start_idx:f_stop_idx]
