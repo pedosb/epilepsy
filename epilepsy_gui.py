@@ -147,6 +147,15 @@ class EpilepsyGui(QtGui.QMainWindow):
 		self.figure_font_size_le = QtGui.QLineEdit('12')
 		figure_font_size_hbox.addWidget(self.figure_font_size_le)
 
+#		figure__hbox = QtGui.QHBoxLayout()
+#		figure__hbox.addWidget(QtGui.QLabel('Font size (pts) '))
+#		self.figure__le = QtGui.QLineEdit('12')
+#		figure__hbox.addWidget(self.figure__le)
+
+		use_latex_hbox = QtGui.QHBoxLayout()
+		self.use_latex_check_box = QtGui.QCheckBox('Use LaTeX?')
+		use_latex_hbox.addWidget(self.use_latex_check_box)
+
 		figure_out_hbox = QtGui.QHBoxLayout()
 		figure_out_button = QtGui.QPushButton('Save Figure')
 		figure_out_button.clicked.connect(self.save_figure)
@@ -156,6 +165,7 @@ class EpilepsyGui(QtGui.QMainWindow):
 		figure_vbox.addItem(figure_size_hbox)
 		figure_vbox.addItem(figure_resolution_hbox)
 		figure_vbox.addItem(figure_font_size_hbox)
+		figure_vbox.addItem(use_latex_hbox)
 		figure_vbox.addItem(figure_out_hbox)
 
 		figure_group_box = QtGui.QGroupBox('Figure Options')
@@ -272,6 +282,11 @@ class EpilepsyGui(QtGui.QMainWindow):
 	def configure_matplotlib(self):
 		mplrc('savefig', dpi=float(self.figure_resolution_le.text()))
 		mplrc('font', size=float(self.figure_font_size_le.text()))
+
+		mplrc('text', usetex=self.use_latex_check_box.isChecked())
+		mplrc('text.latex', unicode=True)
+		mplrc('font', family='serif', serif='Computer Modern Roman')
+
 
 	def plot(self):
 

@@ -21,14 +21,8 @@
 
 import argparse
 import matplotlib.pyplot as plt
-from matplotlib import rc
 import numpy as np
 from os import path
-
-rc('text', usetex=True)
-rc('font', family='serif')
-rc('text.latex', unicode=True)
-rc('font', serif='Computer Modern Roman')
 
 def file_len(f):
 	"""
