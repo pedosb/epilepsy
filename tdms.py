@@ -205,7 +205,7 @@ def _plot_amp_and_fft(tdms, col):
 def _plot_any(tdms, col, plot_list, **kargs):
 	n_col = plot_list.count(True)
 	plot_func = [_plot, _plot_fft, _plot_specgram, _plot_freq_hist]
-	plt.title(path.basename(str(tdms.fn)))
+#	plt.title(path.basename(str(tdms.fn)))
 	if n_col == 1:
 		plot_func[plot_list.index(True)](tdms, **kargs)
 	elif n_col == 2:
