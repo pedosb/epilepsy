@@ -108,6 +108,7 @@ def _plot(tdms, **kargs):
 			ti[1] - ti[0])
 	plt.plot(x,
 		tdms.wav[ti[0]:ti[1]])
+	plt.xlim(x[0], x[-1])
 	plt.grid()
 	plt.xlabel('Time (s)')
 	plt.ylabel('Amplitude ($mV$)')
