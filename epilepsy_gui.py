@@ -276,8 +276,7 @@ class EpilepsyGui(QtGui.QMainWindow):
 		file_name = QtGui.QFileDialog.getSaveFileName(self, 'Save Figure',
 				filter='Images (*.png)')
 		if file_name != '':
-			print file_name
-			self.output_fn = str(file_name)
+			self.output_fn = str(file_name.toAscii())
 			self.plot()
 
 	def configure_matplotlib(self):
