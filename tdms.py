@@ -184,10 +184,14 @@ def plot_fft(*tdms):
 	_plot_all(tdms, _plot_fft)
 
 def _plot_specgram(tdms, **kargs):
+	fft_len = kargs['fft_len']
 	ti = kargs['ti']
-	plt.specgram(tdms.wav.__getslice__(*ti), Fs=tdms.fs)
+	fi = kargs['fi']
+	bins, _, _, _ = plt.specgram(tdms.wav.__getslice__(*ti), fft_len, Fs=tdms.fs)
 	plt.xlabel('Time (segundos)')
 	plt.ylabel(u'Frequency (Hz)')
+	plt.xlim(ti[0] / tdms.fs, ti[-1] / tdms.fs)
+	plt.ylim(fi[0], fi[-1])
 	plt.grid()
 	plt.colorbar()
 
