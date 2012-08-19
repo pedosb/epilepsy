@@ -291,11 +291,11 @@ def plot_joint_psd(tdms_list, ti_list, fft_len=256, fft_scale='db', fi=None,
 		if bar:
 			data_sum = data.sum(1)
 			plt.bar(i+0.1, data_sum.mean(), yerr=data_sum.std(),
-					error_kw=dict(linewidth=6, ecolor='green'))
+					error_kw=dict(elinewidth=6, capsize=10, ecolor='black'), color='white')
 			xticks_list[0].append(i+0.5)
 			xticks_list[1].append(key)
 		else:
-			plt.errorbar(f_list, data.mean(0), data.std(0), label=str(key))
+			plt.errorbar(f_list, data.mean(0), data.std(0), label=str(key), ecolor='b')
 	if bar:
 		plt.xlim((0, len(data_dict)))
 		plt.xticks(*xticks_list)
