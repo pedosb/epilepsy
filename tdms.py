@@ -56,7 +56,7 @@ class Tdms():
 
 		if f.readline().strip() != 'dt:':
 			raise TdmsSyntaxError("Can't find dt flag")
-		self.fs = 1/float(f.readline())
+		self.fs = 1/float(f.readline().strip().replace(',', '.', 1))
 		self.start = ti[0] * self.fs
 		self.stop = ti[1] * self.fs
 
@@ -75,7 +75,10 @@ class Tdms():
 			if line == '' or (c > self.stop and self.stop > 0):
 				break
 #			self.data.append([float(n) for n in line.split('\t')])
-			i = line.split('\t')[-1]
+			if len(self.channels) == 2:
+				i = line.split('\t')[-1]
+			else:
+				i = line.strip().replace(',', '.', 1)
 			self.wav[c] = float(i)
 
 		self.size = len(self.wav)
