@@ -13,8 +13,8 @@ Firstly you need to download and install the following dependencies, during the 
 * [numpy-1.6.1](http://sourceforge.net/projects/numpy/files/NumPy/1.6.1/numpy-1.6.1-win32-superpack-python2.7.exe/download)
 * [scipy-0.10.1](http://sourceforge.net/projects/scipy/files/scipy/0.10.1/scipy-0.10.1-win32-superpack-python2.7.exe/download)
 * PyQt4 (use the first if running a 64bit Windows and the second for a 32bit one)
-** [PyQt4-4.11.1-x64](http://sourceforge.net/projects/pyqt/files/PyQt4/PyQt-4.11.1/PyQt4-4.11.1-gpl-Py2.7-Qt4.8.6-x64.exe)
-** [PyQt4-4.11.1-x32](http://sourceforge.net/projects/pyqt/files/PyQt4/PyQt-4.11.1/PyQt4-4.11.1-gpl-Py2.7-Qt4.8.6-x32.exe)
+  * [PyQt4-4.11.1-x64](http://sourceforge.net/projects/pyqt/files/PyQt4/PyQt-4.11.1/PyQt4-4.11.1-gpl-Py2.7-Qt4.8.6-x64.exe)
+  * [PyQt4-4.11.1-x32](http://sourceforge.net/projects/pyqt/files/PyQt4/PyQt-4.11.1/PyQt4-4.11.1-gpl-Py2.7-Qt4.8.6-x32.exe)
 * [Git-1.9.4](https://github.com/msysgit/msysgit/releases/download/Git-1.9.4-preview20140611/Git-1.9.4-preview20140611.exe)
 
 # Download of epilepsy
